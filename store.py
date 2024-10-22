@@ -1,11 +1,19 @@
+"""
+Represents a store that contains a collection of products.
+
+Attributes:
+    products (list): A list of Product objects available in the store.
+"""
+
+
 class Store:
     def __init__(self, products) -> None:
         self.products = [*products]
 
-    def add_product(self, product):
+    def add_product(self, product) -> None:
         self.products.append(product)
 
-    def remove_product(self, product):
+    def remove_product(self, product) -> None:
         self.products.remove(product)
 
     def get_total_quantity(self) -> int:
@@ -18,7 +26,16 @@ class Store:
                 active_products.append(product)
         return active_products
 
-    def order(self, shopping_list):
+    def order(self, shopping_list: list[tuple]) -> str:
+        """Get total price of ordered items from shopping_list
+        and update quantity of products in Store.
+
+        Arguments:
+            shopping_list -- [(product_obj, quantity_to_order)]
+
+        Returns:
+            Total price of all items
+        """
         total_price = 0
 
         for product, quantity in shopping_list:
