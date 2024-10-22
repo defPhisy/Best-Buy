@@ -20,6 +20,22 @@ class Store:
 
     def order(self, shopping_list):
         total_price = 0
+
         for product, quantity in shopping_list:
-            total_price += product.buy(quantity)
+            if quantity > product.quantity:
+                message = (
+                    "Error while making order! "
+                    + "Quantity larger than what exists"
+                    + f"Quantity of {product.name}: {product.quantity}"
+                )
+                return message
+            elif not product.active:
+                message = (
+                    "Error while making order! "
+                    + f"Product {product.name} is Inactive"
+                )
+                return message
+            else:
+                total_price += product.buy(quantity)
+
         return f"Order cost: ${total_price:.2f}"
