@@ -23,9 +23,12 @@ class Product:
             self.price = price
 
         if self.quantity_is_valid(quantity):
-            self.quantity = quantity
+            self._quantity = quantity
 
-        self.active = True
+        if self._quantity == 0:
+            self.active = False
+        else:
+            self.active = True
 
         Product.total_quantity += quantity
 
@@ -33,13 +36,19 @@ class Product:
         if name:
             return True
         else:
-            raise ValueError("Name must have at leas one letter!")
+            raise ValueError("Product name must have at least one letter!")
 
     def price_is_valid(self, price):
-        if type(price) is float or type(price is int):
-            return True
+        test = []
+        if type(price) is float or type(price) is int:
+            test.append(True)
         else:
-            raise TypeError("Price must be a float!")
+            raise TypeError("Price must be an integer or a float!")
+        if price >= 0:
+            test.append(True)
+        else:
+            raise ValueError("Price must be 0 or positive!")
+        return all(test)
 
     def quantity_is_valid(self, quantity):
         if type(quantity) is int and quantity >= 0:
@@ -47,16 +56,22 @@ class Product:
         else:
             raise Exception("Quantity must be a positive integer")
 
-    def get_quantity(self) -> int:
-        return self.quantity
+    @property
+    def quantity(self) -> int:
+        return self._quantity
 
-    def set_quantity(self, quantity: int) -> None:
+    @quantity.setter
+    def quantity(self, quantity: int) -> None:
         """Sets the quantity of the product
         and deactivates it if the quantity is zero."""
         if self.quantity_is_valid(quantity):
-            self.quantity = quantity
-            if self.quantity == 0:
-                self.active = False
+            self._quantity = quantity
+        if self._quantity == 0:
+            self.deactivate()
+        if self._quantity < 0:
+            raise ValueError(
+                f"Cannot buy more {self.name}'s than {self._quantity}"
+            )
 
     def is_active(self) -> bool:
         return self.active
@@ -68,12 +83,12 @@ class Product:
         self.active = False
 
     def show(self) -> str:
-        return f"{self.name}, Price: {self.price}, Quantity: {self.quantity}"
+        return f"{self.name}, Price: {self.price}, Quantity: {self._quantity}"
 
     def buy(self, quantity: int) -> float:
         """Reduces the product quantity by the specified amount,
         deducts from total quantity,
         and returns the total price for the quantity bought."""
-        self.set_quantity(self.quantity - quantity)
+        self._quantity -= quantity
         Product.total_quantity -= quantity
         return self.price * quantity
