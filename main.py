@@ -73,13 +73,11 @@ def print_all_products(store_obj) -> None:
     print("----------")
 
 
-
 def print_total_amount(store_obj) -> None:
     """Print total amount of all items in store"""
     products = store_obj.get_all_products()
     quantity = sum([product.quantity for product in products])
     print(f"Total of {quantity} items in store")
-
 
 
 def make_order(store_obj) -> None:
