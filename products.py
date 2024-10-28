@@ -92,3 +92,40 @@ class Product:
         self._quantity -= quantity
         Product.total_quantity -= quantity
         return self.price * quantity
+
+
+class NonStockedProduct(Product):
+    def __init__(self, name: str, price: float, quantity: int = 0) -> None:
+        super().__init__(name, price, quantity)
+        self.activate()
+
+    @property
+    def quantity(self) -> int:
+        return self._quantity
+
+    @quantity.setter
+    def quantity(self, quantity: int) -> None:
+        """Locks the quantity of the product at zero
+        and keep it active"""
+
+        if quantity != 0:
+            raise ValueError("Non stocked products have no quantity")
+
+        self._quantity = 0
+
+    def show(self) -> str:
+        return f"{self.name}, Price: {self.price}"
+
+
+class LimitedProduct(Product):
+    def __init__(
+        self, name: str, price: float, quantity: int, maximum: int
+    ) -> None:
+        super().__init__(name, price, quantity)
+        self._maximum = maximum
+
+    def show(self) -> str:
+        return (
+            f"{self.name}, Price: {self.price}, Quantity: {self._quantity}"
+            + f", Maximum: {self._maximum}"
+        )
