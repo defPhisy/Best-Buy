@@ -1,7 +1,8 @@
-from products import Product
+from products import Product, NonStockedProduct, LimitedProduct
 import pytest
 
 
+# Class Product
 def test_product_instantiation():
     """Test correct instantiation of Product object"""
     product = Product("MacBook Air M2", price=10, quantity=100)
@@ -9,7 +10,7 @@ def test_product_instantiation():
     assert product.name == "MacBook Air M2", "product has wrong name"
     assert product.price == 10, "product has wrong price"
     assert product._quantity == 100, "product has wrong quantity"
-    assert product.is_active()
+    assert product.is_active(), "product is not active"
 
 
 def test_product_without_name():
@@ -30,15 +31,17 @@ def test_product_with_negative_price():
 
 def test_price_type():
     """Test that a wrong price types raise a TypeError"""
-    price_arguments = ["ten", "", None, True, [1, 3], False, [], {}]
+    price_arguments = ["ten", "", None, True, [1, "", "Hello"], False, [], {}]
 
     for argument in price_arguments:
         with pytest.raises(TypeError) as error:
             Product("MacBook Air M2", price=argument, quantity=100)
-        assert str(error.value) == "Price must be an integer or a float!"
+        assert (
+            str(error.value) == "Price must be an integer or a float!"
+        ), f"Failed with type:'{type(argument)}'"
 
 
-def test_quantity():
+def test_quantity_update():
     product = Product("MacBook Air M2", price=10, quantity=10)
     product.quantity -= 9
     assert product.quantity == 1, "product has wrong quantity"
@@ -69,3 +72,45 @@ def test_exceed_quantity():
         str(error.value)
         == f"Cannot buy more {product.name}'s than {product.quantity}"
     )
+
+
+# ----------------------------------------------------------------------------
+
+
+# Class NonStockedProduct
+def test_non_stocked_product_instantiation():
+    product = NonStockedProduct("Windows License", price=125)
+    assert isinstance(
+        product, NonStockedProduct
+    ), "product has not created a Product"
+    assert product.name == "Windows License", "product has wrong name"
+    assert product.price == 125, "product has wrong price"
+    assert product._quantity == 0, "product has wrong quantity"
+    assert product.is_active(), "product is not active"
+
+
+def test_quantity_not_zero():
+    product = NonStockedProduct("Windows License", price=125)
+    quantities = [1, 12, -11, -1]
+    for quantity in quantities:
+        with pytest.raises(ValueError) as error:
+            product.quantity = 10
+        assert str(error.value) == "Non stocked products have no quantity"
+
+    assert product.quantity == 0
+
+
+# ----------------------------------------------------------------------------
+
+
+# Class LimitedProduct
+def test_limited_product_instantiation():
+    product = LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
+    assert isinstance(
+        product, LimitedProduct
+    ), "product has not created a Product"
+    assert product.name == "Shipping", "product has wrong name"
+    assert product.price == 10, "product has wrong price"
+    assert product._quantity == 250, "product has wrong quantity"
+    assert product._maximum == 1, "product has wrong maximum"
+    assert product.is_active(), "product is not active"
