@@ -5,6 +5,8 @@ Attributes:
     products (list): A list of Product objects available in the store.
 """
 
+from products import NonStockedProduct
+
 
 class Store:
     def __init__(self, products) -> None:
@@ -39,11 +41,14 @@ class Store:
         total_price = 0
 
         for product, quantity in shopping_list:
-            if quantity > product.quantity:
+            if quantity > product.quantity and not isinstance(
+                product, NonStockedProduct
+            ):
                 message = (
                     "Error while making order! "
-                    + "Quantity larger than what exists"
-                    + f"Quantity of {product.name}: {product.quantity}"
+                    + "Quantity larger than what exists\n"
+                    + f"Quantity of {product.name}: {product.quantity}\n"
+                    + f"Order cost: ${total_price:.2f}"
                 )
                 return message
             elif not product.active:

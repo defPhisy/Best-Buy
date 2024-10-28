@@ -116,6 +116,10 @@ class NonStockedProduct(Product):
     def show(self) -> str:
         return f"{self.name}, Price: {self.price}"
 
+    def buy(self, quantity: int) -> float:
+        """Returns the total price for the quantity bought."""
+        return self.price * quantity
+
 
 class LimitedProduct(Product):
     def __init__(
