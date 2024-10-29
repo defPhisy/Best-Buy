@@ -11,16 +11,17 @@ and percentage-based discounts.
 Usage:
     Run the script to start the CLI, view products, and place orders. Example:
 
-    $ python cli.py
+    $ python main.py
 
 Dependencies:
     Requires the `store`, `products`, and `promotions` modules.
 """
 
 from typing import NoReturn
-from products import Product, NonStockedProduct, LimitedProduct
-from store import Store
-from promotions import SecondHalfPrice, ThirdOneFree, PercentDiscount
+
+from app.products import LimitedProduct, NonStockedProduct, Product
+from app.promotions import PercentDiscount, SecondHalfPrice, ThirdOneFree
+from app.store import Store
 
 
 def main() -> NoReturn:

@@ -16,7 +16,7 @@ Dependencies:
 """
 
 from abc import ABC
-import products
+import app.products as products
 
 
 class Promotion(ABC):

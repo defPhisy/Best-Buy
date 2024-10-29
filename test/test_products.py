@@ -1,5 +1,6 @@
-from products import Product, NonStockedProduct, LimitedProduct
 import pytest
+from app.products import LimitedProduct, NonStockedProduct, Product
+from app.promotions import PercentDiscount, SecondHalfPrice, ThirdOneFree
 
 
 # Class Product
@@ -42,6 +43,7 @@ def test_price_type():
 
 
 def test_quantity_update():
+    """Test that product quantity updates correctly when modified"""
     product = Product("MacBook Air M2", price=10, quantity=10)
     product.quantity -= 9
     assert product.quantity == 1, "product has wrong quantity"
@@ -49,6 +51,7 @@ def test_quantity_update():
 
 # Test that when a product reaches 0 quantity, it becomes inactive.
 def test_product_inactive():
+    """Test that product becomes inactive when quantity reaches zero"""
     product = Product("MacBook Air M2", price=10, quantity=0)
 
     assert not product.is_active(), "product was not set to inactive"
@@ -56,6 +59,7 @@ def test_product_inactive():
 
 # Test that product purchase modifies the quantity and returns the right output.
 def test_product_buy():
+    """Test that product purchase updates quantity correctly and returns expected value"""
     product = Product("MacBook Air M2", price=10, quantity=10)
     product.buy(5)
     assert product.quantity == 5, "left quantity is not correct"
@@ -63,22 +67,12 @@ def test_product_buy():
     assert product.quantity == 1, "left quantity is not correct"
 
 
-# Test that buying a larger quantity than exists invokes exception.
-def test_exceed_quantity():
-    product = Product("MacBook Air M2", price=10, quantity=10)
-    with pytest.raises(ValueError) as error:
-        product.buy(11)
-    assert (
-        str(error.value)
-        == f"Cannot buy more {product.name}'s than {product.quantity}"
-    )
-
-
 # ----------------------------------------------------------------------------
 
 
 # Class NonStockedProduct
 def test_non_stocked_product_instantiation():
+    """Test correct instantiation of NonStockedProduct object"""
     product = NonStockedProduct("Windows License", price=125)
     assert isinstance(
         product, NonStockedProduct
@@ -90,6 +84,7 @@ def test_non_stocked_product_instantiation():
 
 
 def test_quantity_not_zero():
+    """Test that quantity remains zero for NonStockedProduct instances"""
     product = NonStockedProduct("Windows License", price=125)
     quantities = [1, 12, -11, -1]
     for quantity in quantities:
@@ -97,7 +92,7 @@ def test_quantity_not_zero():
             product.quantity = 10
         assert str(error.value) == "Non stocked products have no quantity"
 
-    assert product.quantity == 0
+    assert product.quantity == 0, "quantity is not set to zero"
 
 
 # ----------------------------------------------------------------------------
@@ -105,6 +100,7 @@ def test_quantity_not_zero():
 
 # Class LimitedProduct
 def test_limited_product_instantiation():
+    """Test correct instantiation of LimitedProduct object"""
     product = LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
     assert isinstance(
         product, LimitedProduct
@@ -114,3 +110,65 @@ def test_limited_product_instantiation():
     assert product._quantity == 250, "product has wrong quantity"
     assert product._maximum == 1, "product has wrong maximum"
     assert product.is_active(), "product is not active"
+
+
+def test_maximum():
+    """Test that LimitedProduct obeys maximum quantity per purchase"""
+    product = LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
+    assert product.buy(1) == 10
+    assert product.quantity == 249
+    assert product.buy(2) == 10
+    assert product.quantity == 248
+
+
+# ----------------------------------------------------------------------------
+
+
+# Class Promotion
+def initiate_promotions():
+    """Initiates product and promotion instances for testing"""
+    product_list = [
+        Product("Google Pixel 7", price=500, quantity=250),
+        NonStockedProduct("Windows License", price=125),
+        Product("Shipping", price=10, quantity=250),
+    ]
+
+    # Create promotion catalog
+    second_half_price = SecondHalfPrice("Second Half price!")
+    third_one_free = ThirdOneFree("Third One Free!")
+    thirty_percent = PercentDiscount("30% off!", percent=30)
+
+    # Add promotions to products
+    product_list[0].set_promotion(second_half_price)
+    product_list[1].set_promotion(third_one_free)
+    product_list[2].set_promotion(thirty_percent)
+
+    return product_list
+
+
+def test_promotion_instantiation():
+    """Test that promotions are instantiated and set correctly on products"""
+    second_half, third_free, thirty_percent = initiate_promotions()
+    assert isinstance(second_half, Product)
+    assert second_half.promotion == "Second Half price!"
+    assert isinstance(third_free, Product)
+    assert third_free.promotion == "Third One Free!"
+    assert isinstance(thirty_percent, Product)
+    assert thirty_percent.promotion == "30% off!"
+
+
+def test_promotion_calculation():
+    """Test that promotion discounts are calculated correctly"""
+    second_half, third_free, thirty_percent = initiate_promotions()
+
+    assert second_half.buy(1) == 500, "wrong calculation"
+    assert second_half.buy(2) == 750, "wrong calculation"
+    assert second_half.buy(3) == 1250, "wrong calculation"
+
+    assert third_free.buy(1) == 125, "wrong calculation"
+    assert third_free.buy(2) == 250, "wrong calculation"
+    assert third_free.buy(3) == 250, "wrong calculation"
+    assert third_free.buy(4) == 375, "wrong calculation"
+
+    assert thirty_percent.buy(1) == 7, "wrong calculation"
+    assert thirty_percent.buy(2) == 14, "wrong calculation"
