@@ -12,7 +12,7 @@ Each class includes methods for activating/deactivating products,
 displaying product information, and handling purchases.
 """
 
-from app.promotions import Promotion
+from promotions import Promotion
 
 
 class Product:

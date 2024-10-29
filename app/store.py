@@ -5,7 +5,7 @@ Attributes:
     products (list): A list of Product objects available in the store.
 """
 
-from app.products import NonStockedProduct
+from products import NonStockedProduct
 
 
 class Store:

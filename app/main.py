@@ -19,9 +19,9 @@ Dependencies:
 
 from typing import NoReturn
 
-from app.products import LimitedProduct, NonStockedProduct, Product
-from app.promotions import PercentDiscount, SecondHalfPrice, ThirdOneFree
-from app.store import Store
+from products import LimitedProduct, NonStockedProduct, Product
+from promotions import PercentDiscount, SecondHalfPrice, ThirdOneFree
+from store import Store
 
 
 def main() -> NoReturn:
