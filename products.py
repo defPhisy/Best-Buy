@@ -281,7 +281,10 @@ class LimitedProduct(Product):
 
         if quantity > self._maximum:
             print(f"Cannot buy more than {self._maximum} {self.name}'s!")
+            quantity = self._maximum
         if isinstance(self._promotion, Promotion):
             return self._promotion.apply_promotions(self, self._maximum)
         else:
-            return self.price * self._maximum
+            self._quantity -= quantity
+            Product.total_quantity -= quantity
+            return self.price * quantity
